@@ -18,8 +18,8 @@ multiplications *)
 Inductive expr : Type :=
 | Const of nat
 | Plus of expr & expr
-| Minus of ...
-| Mult of ...
+| Minus of expr & expr
+| Mult of expr & expr
 .
 
 (** Let us define a special notation for our language.
@@ -45,8 +45,8 @@ Notation "x + y" := (Plus x y) (in custom expr at level 2, left associativity).
 (* Define notations for subtraction and multiplication.
    Hint: lower level means higher priority.
    Your notations should start with `in custom expr` as above. *)
-Notation "x - y" := ...
-Notation "x * y" := ...
+Notation "x - y" := (Minus x y) (in custom expr at level 2, left associativity).
+Notation "x * y" := (Mult x y) (in custom expr at level 1, left associativity).
 
 (** Here is how we write Plus (Const 0) (Plus (Const 1) (Const 2)) *)
 Check [[
@@ -76,7 +76,12 @@ Check [[
 Basically, the semantics of the expression language should be the same as
 the corresponding Coq functions `addn`, `subn`, `muln`. *)
 Fixpoint eval (e : expr) : nat :=
-  ...
+  match e with
+  | Const n => n
+  | Plus e1 e2 => eval e1 + eval e2
+  | Minus e1 e2 => eval e1 - eval e2
+  | Mult e1 e2 => eval e1 * eval e2
+  end.
 
 (** Some unit tests *)
 (** We haven't discussed in depth what `erefl` means yet.
@@ -87,7 +92,6 @@ Check erefl : eval [[ 0 + (2 - 1) ]] = 1.
 Check erefl : eval [[ (0 + 1) + 2 ]] = 3.
 Check erefl : eval [[ 2 + 2 * 2 ]] = 6.
 Check erefl : eval [[ (2 + 2) * 2 ]] = 8.
-...
 
 
 (** * Compiling arithmetic expressions to a stack language *)
@@ -136,33 +140,65 @@ And the type of stacks like so:
     Definition stack := seq nat.
 *)
 
+Definition prog := seq instr.
+
+Definition stack := seq nat.
 
 (** The [run] function is an interpreter for the stack language. It takes a
  program (list of instructions) and the current stack, and processes the program
  instruction-by-instruction, returning the final stack. *)
 Fixpoint run (p : prog) (s : stack) : stack :=
-  ...
+  match p with
+  | [::] => s
+  | Push n :: p' => run p' (n :: s)
+  | Add :: p' => if s is m :: n :: s' then run p' (n + m :: s') else [::]
+  | Sub :: p' => if s is m :: n :: s' then run p' (n - m :: s') else [::]
+  | Mul :: p' => if s is m :: n :: s' then run p' (n * m :: s') else [::]
+  end.
 
 (** Unit tests: *)
 Check erefl :
-  run [:: ... stack-program ...] [::] = [:: ... stack-of-numbers ...].
-...
-
+  run [:: Push 5; Push 6; Push 4; Add] [::] = [:: 10; 5].
+Check erefl :
+  run [:: Push 5; Push 6; Mul; Push 1] [::] = [:: 1; 30].
+Check erefl :
+  run [:: Push 5; Sub] [::] = [::].
+Check erefl :
+  run [:: Push 5; Push 1; Sub] [::] = [:: 4].
 
 (** Now, implement a compiler from "high-level" expressions to "low-level" stack
 programs and do some unit tests. *)
 Fixpoint compile (e : expr) : prog :=
-  ...
+  match e with
+  | Const n => [:: Push n]
+  | Plus e1 e2  => compile e1 ++ compile e2 ++ [:: Add]
+  | Minus e1 e2 => compile e1 ++ compile e2 ++ [:: Sub]
+  | Mult e1 e2  => compile e1 ++ compile e2 ++ [:: Mul]
+  end.
+
+Definition e1 := [[ 5 ]].
+Definition e2 := [[ 1 + 4 + 5]].
+Definition e3 := [[ (1 + 4) * (20 - 5 * 2) ]].
 
 (** Do some unit tests *)
 Check erefl :
-  compile [[ ... expression ... ]] = [:: ... stack-program ].
-...
+  compile e1 = [:: Push 5 ].
+Check erefl :
+  compile e2 = [:: Push 1; Push 4; Add; Push 5; Add].
+Check erefl :
+  compile e3 = [:: Push 1; Push 4; Add; Push 20; Push 5; Push 2; Mul; Sub; Mul].
+
 (* Some ideas for unit tests:
   - check that `run (compile e) [::] = [:: eval e]`, where `e` is an arbitrary expression;
   - check that `compile` is an injective function
 *)
 
+Check erefl :
+  run (compile e1) [::] = [:: eval e1].
+Check erefl :
+  run (compile e2) [::] = [:: eval e2].
+Check erefl :
+  run (compile e3) [::] = [:: eval e3].
 
 (** Optional exercise: decompiler *)
 
@@ -170,8 +206,45 @@ Check erefl :
 expression *)
 (* Hint: you might want to introduce a recursive helper function `decompile'` to
  reuse it for `decompile`. *)
+
+Definition option_bind {A B : Type} (m : option A) (k : A -> option B) : option B :=
+  if m is Some x then k x else None.
+
+Notation "m >>= k" := (option_bind m k) (at level 10, left associativity).
+
+Fixpoint decompile' (p : prod)
+
+Definition decompile (p : prod) : option expr :=
+  match p with
+  | [::] => None
+  | Push n =>
+
+(* Fixpoint decompile' (p : prog) : option (prod expr prog) :=
+  match p with
+  | [::] => None
+  | Push n :: p' => Some (Const n, p')
+  | Add :: p' =>
+    decompile' p' >>=
+    fun '(e1, p'') =>
+    decompile' p'' >>=
+    fun '(e2, p''') =>
+    if p''' is [::] then None else Some (Plus e1 e2, p''')
+  | Sub :: p' =>
+    decompile' p' >>=
+    fun '(e1, p'') =>
+    decompile' p'' >>=
+    fun '(e2, p''') =>
+    if p''' is [::] then None else Some (Minus e1 e2, p''')
+  | Mul :: p' =>
+    decompile' p' >>=
+    fun '(e1, p'') =>
+    decompile' p'' >>=
+    fun '(e2, p''') =>
+    if p''' is [::] then None else Some (Mult e1 e2, p''')
+  end.
+
 Definition decompile (p : prog) : option expr :=
-  ...
+  if decompile' (rev p) is Some (e, [::]) then e else None. *)
 
 (** Unit tests *)
 Check erefl :
