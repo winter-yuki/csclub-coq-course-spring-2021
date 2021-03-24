@@ -212,44 +212,43 @@ Definition option_bind {A B : Type} (m : option A) (k : A -> option B) : option 
 
 Notation "m >>= k" := (option_bind m k) (at level 10, left associativity).
 
-Fixpoint decompile' (p : prod)
+Definition option_fmap {A B : Type} (g : A -> B) (f : option A) : option B :=
+  f >>= fun x => Some (g x).
 
-Definition decompile (p : prod) : option expr :=
-  match p with
-  | [::] => None
-  | Push n =>
+Notation "g <$> f" := (option_fmap g f) (at level 10, left associativity).
 
-(* Fixpoint decompile' (p : prog) : option (prod expr prog) :=
+Fixpoint decompile' (p : prog) (n : nat) : prod (seq expr) prog :=
+  if n is O then ([::], p) else
   match p with
-  | [::] => None
-  | Push n :: p' => Some (Const n, p')
+  | [::] => ([::], p)
+  | Push m :: p' =>
+    let '(es, p'') := decompile' p' (n - 1) in
+    (Const m :: es, p'')
   | Add :: p' =>
-    decompile' p' >>=
-    fun '(e1, p'') =>
-    decompile' p'' >>=
-    fun '(e2, p''') =>
-    if p''' is [::] then None else Some (Plus e1 e2, p''')
+    let '(es, p'') := decompile' p' (n + 1) in
+    if es is e2 :: e1 :: es'
+    then (Plus e1 e2 :: es', p'')
+    else ([::], p')
   | Sub :: p' =>
-    decompile' p' >>=
-    fun '(e1, p'') =>
-    decompile' p'' >>=
-    fun '(e2, p''') =>
-    if p''' is [::] then None else Some (Minus e1 e2, p''')
+    let '(es, p'') := decompile' p' (n + 1) in
+    if es is e2 :: e1 :: es'
+    then (Minus e1 e2 :: es', p'')
+    else ([::], p')
   | Mul :: p' =>
-    decompile' p' >>=
-    fun '(e1, p'') =>
-    decompile' p'' >>=
-    fun '(e2, p''') =>
-    if p''' is [::] then None else Some (Mult e1 e2, p''')
+    let '(es, p'') := decompile' p' (n + 1) in
+    if es is e2 :: e1 :: es'
+    then (Mult e1 e2 :: es', p'')
+    else ([::], p')
   end.
 
 Definition decompile (p : prog) : option expr :=
-  if decompile' (rev p) is Some (e, [::]) then e else None. *)
+  let '(es, _) := decompile' (rev p) 1 in
+  if es is e :: es' then Some e else None.
 
 (** Unit tests *)
-Check erefl :
-  decompile [:: ... stack-program ] = some [[ expression ]].
-...
+Check erefl : decompile (compile e1) = Some e1.
+Check erefl : decompile (compile e2) = Some e2.
+Check erefl : decompile (compile e3) = Some e3.
 
 (* Some ideas for unit tests:
   - check that `decompile (compile e) = Some e`, where `e` is an arbitrary expression
