@@ -4,26 +4,27 @@ Variables A B C : Prop.
 
 Definition anb1 :
   A /\ B -> A
-:=
+:= fun '(conj a _) => a.
 
 Definition impl_trans :
   (A -> B) -> (B -> C) -> A -> C
-:=
+:= fun f g => fun x => g (f x).
 
 Definition HilbertS :
   (A -> B -> C) -> (A -> B) -> A -> C
-:=
+:= fun f g => fun a => f a (g a).
 
-Definition DNE_triple_neg :
-  ~ ~ ~ A -> ~ A
-:=
+Definition DNE_triple_neg : ~ ~ ~ A -> ~ A :=
+  fun nnna a => nnna (fun na => na a).
 
 Definition or_comm :
   A \/ B -> B \/ A
-:=
+:= fun ab => match ab with
+| or_introl a => or_intror a
+| or_intror b => or_introl b
+end.
 
 End PropositionalLogic.
-
 
 
 Section Quantifiers.
@@ -33,30 +34,36 @@ Variable A : Prop.
 Variable P Q : T -> Prop.
 Definition forall_conj_comm :
   (forall x, P x /\ Q x) <-> (forall x, Q x /\ P x)
-:=
+:= conj
+  (fun xpxqx => fun x' => let '(conj px qx) := xpxqx x' in conj qx px)
+  (fun xpxqx => fun x' => let '(conj px qx) := xpxqx x' in conj qx px).
 
 Definition forall_disj_comm :
   (forall x, P x \/ Q x) <-> (forall x, Q x \/ P x)
-:=
+:= conj
+  (fun all => fun x => or_comm (P x) (Q x) (all x))
+  (fun all => fun x => or_comm (Q x) (P x) (all x)).
 
 Definition not_exists_forall_not :
   ~(exists x, P x) -> forall x, ~P x
-:=
+:= fun nex => fun x => fun px => nex (ex_intro _ x px).
 
-Definition exists_forall_not_ :
-(exists x, A -> P x) -> (forall x, ~P x) -> ~A.
+(* Definition exists_forall_not_ :
+  (exists x, A -> P x) -> (forall x, ~P x) -> ~A
+:= fun '(ex_intro _ x apx) => fun x' => fun npx => fun a =>
+  npx () *)
 
+(*
 (** Extra exercise (feel free to skip): the dual Frobenius rule *)
 Definition LEM :=
   forall P : Prop, P \/ ~ P.
 
 Definition Frobenius2 :=
   forall (A : Type) (P : A -> Prop) (Q : Prop),
-    (forall x, Q \/ P x) <-> (Q \/ forall x, P x).
-
-Definition lem_iff_Frobenius2 :
-  LEM <-> Frobenius2
-:=
+    (forall x, Q \/ P x) <-> (Q \/ forall x, P x). *)
+(*
+Definition lem_iff_Frobenius2 :=
+  LEM <-> Frobenius2. *)
 
 End Quantifiers.
 
@@ -66,22 +73,30 @@ End Quantifiers.
 
 Section Equality.
 
-Definition iff_is_if_and_only_if :
+(* Definition iff_is_if_and_only_if :
   forall a b : bool, (a ==> b) && (b ==> a) = (a == b)
 :=
 
 Definition negbNE :
   forall b : bool, ~~ ~~ b = true -> b = true
-:=
+:= *)
 
 (** exercise: *)
 Definition f_congr {A B} (f : A -> B) (x y : A) :
-  x = y  ->  f x = f y
-:=
+  x = y -> f x = f y
+:= fun xy => match xy in (_ = b) return (f x = f b) with
+| eq_refl => eq_refl
+end.
 
 Definition f_congr' A B (f g : A -> B) (x y : A) :
   f = g  ->  x = y  ->  f x = g y
-:=
+:= fun fg xy =>
+  match fg in _ = g' return f x = g' y with
+  | eq_refl =>
+  match xy in _ = y' return  f x = f y' with
+  | eq_refl => eq_refl
+  end
+  end.
 
 (** extra exercise *)
 Definition congId A {x y : A} (p : x = y) :
