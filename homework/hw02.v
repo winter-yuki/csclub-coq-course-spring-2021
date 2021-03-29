@@ -243,7 +243,7 @@ Fixpoint decompile' (p : prog) (n : nat) : prod (seq expr) prog :=
 
 Definition decompile (p : prog) : option expr :=
   let '(es, _) := decompile' (rev p) 1 in
-  if es is e :: es' then Some e else None.
+  if es is [:: e] then Some e else None.
 
 (** Unit tests *)
 Check erefl : decompile (compile e1) = Some e1.
