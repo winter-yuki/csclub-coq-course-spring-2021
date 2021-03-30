@@ -2,6 +2,8 @@ Section PropositionalLogic.
 
 Variables A B C : Prop.
 
+Axiom todo : forall {A : Type}, A.
+
 Definition anb1 :
   A /\ B -> A
 := fun '(conj a _) => a.
@@ -73,13 +75,15 @@ End Quantifiers.
 
 Section Equality.
 
+(* From mathcomp Require Import ssreflect ssrfun ssrbool eqtype. *)
+
 (* Definition iff_is_if_and_only_if :
   forall a b : bool, (a ==> b) && (b ==> a) = (a == b)
-:=
+:= todo.
 
 Definition negbNE :
   forall b : bool, ~~ ~~ b = true -> b = true
-:= *)
+:= todo. *)
 
 (** exercise: *)
 Definition f_congr {A B} (f : A -> B) (x y : A) :
@@ -100,12 +104,16 @@ Definition f_congr' A B (f g : A -> B) (x y : A) :
 
 (** extra exercise *)
 Definition congId A {x y : A} (p : x = y) :
-  f_congr (fun x => x) p = p :=
+  f_congr (fun x => x) p = p.
+Proof.
 
 (* exercise *)
 Definition pair_inj A B (a1 a2 : A) (b1 b2 : B) :
   (a1, b1) = (a2, b2) -> (a1 = a2) /\ (b1 = b2)
-:=
+:= fun p =>
+  match p in _ = (a2', b2') return (a1 = a2') /\ (b1 = b2') with
+  | eq_refl => conj eq_refl eq_refl
+  end.
 
 End Equality.
 
@@ -120,7 +128,7 @@ Variables A B C D : Type.
 
 Definition compA (f : A -> B) (g : B -> C) (h : C -> D) :
   (h \o g) \o f = h \o (g \o f)
-:=
+:= eq_refl.
 
 
 (** [=1] stands for extensional equality on unary functions,
@@ -132,29 +140,29 @@ Definition compA (f : A -> B) (g : B -> C) (h : C -> D) :
 (** Exercise: Reflexivity *)
 Definition eqext_refl :
   forall (f : A -> B), f =1 f
-:=
+:= todo.
 
 (** Exercise: Symmetry *)
 Definition eqext_sym :
   forall (f g : A -> B), f =1 g -> g =1 f
-:=
+:= todo.
 
 (** Exercise: Transitivity *)
 Definition eqext_trans :
   forall (f g h : A -> B), f =1 g -> g =1 h -> f =1 h
-:=
+:= todo.
 
 (** Exercise: left congruence *)
 Definition eq_compl :
   forall (f g : A -> B) (h : B -> C),
     f =1 g -> h \o f =1 h \o g
-:=
+:= todo.
 
 (** Exercise: right congruence *)
 Definition eq_compr :
   forall (f g : B -> C) (h : A -> B),
     f =1 g -> f \o h =1 g \o h
-:=
+:= todo.
 
 End ExtensionalEqualityAndComposition.
 
@@ -169,8 +177,8 @@ different lemma.
 
 Definition iff_is_if_and_only_if :
   forall a b : bool, (a ==> b) && (b ==> a) = (a == b)
-:=
+:= todo.
 
 Definition negbNE :
   forall b : bool, ~~ ~~ b = true -> b = true
-:=
+:= todo.
