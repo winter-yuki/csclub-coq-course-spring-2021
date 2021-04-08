@@ -4,7 +4,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Axiom replace_with_your_solution_here : forall {A : Type}, A.
+Axiom todo : forall {A : Type}, A.
 
 
 
@@ -15,13 +15,18 @@ Axiom replace_with_your_solution_here : forall {A : Type}, A.
 
 Definition and_via_ex (A B : Prop) :
   (exists (_ : A), B) <-> A /\ B
-:= replace_with_your_solution_here.
+:= conj
+  (fun '(ex_intro a b) => conj a b)
+  (fun '(conj a b) => ex_intro (fun _ => B) a b).
 
 
 (** * Exercise *)
 Definition pair_inj A B (a1 a2 : A) (b1 b2 : B) :
   (a1, b1) = (a2, b2) -> (a1 = a2) /\ (b1 = b2)
-:= replace_with_your_solution_here.
+:= fun e =>
+  match e in _ = (a2', b2') return (a1 = a2') /\ (b1 = b2') with
+  | erefl => conj erefl erefl
+  end.
 
 
 (** * Exercise (optional) *)
@@ -29,34 +34,47 @@ Definition J :
   forall (A : Type) (P : forall (x y : A), x = y -> Prop),
     (forall x : A, P x x erefl) ->
     forall x y (p : x = y), P x y p
-:= replace_with_your_solution_here.
+:= todo.
+
+(* fun A P pxxe x y p =>
+  (match p in (_ = y') return (p -> P x y' p) with
+  | erefl => fun p' => p' x x (erefl)
+  end) p. *)
 
 
 (** * Exercise *)
 Definition false_eq_true_implies_False :
   forall n, n.+1 = 0 -> False
-:= replace_with_your_solution_here.
-
+:= fun _ e =>
+  match e
+    in _ = z
+    return if z is O then False else True
+  with
+  | erefl => I
+  end.
 
 (** * Exercise *)
 Definition addnS :
   forall m n, m + n.+1 = (m + n).+1
-:= replace_with_your_solution_here.
-
+:= fix rec m n :=
+  match m return m + n.+1 = (m + n).+1 with
+  | O => erefl
+  | S m' => congr1 S (rec m' n)
+  end.
 
 (** * Exercise *)
 Definition addA : associative addn
-:= replace_with_your_solution_here.
+:= todo.
 
 
 (** * Exercise: *)
 Definition addnCA : left_commutative addn
-:= replace_with_your_solution_here.
+:= todo.
 
 
 (** * Exercise (optional): *)
 Definition addnC : commutative addn
-:= replace_with_your_solution_here.
+:= todo.
 
 
 (** * Exercise (optional):
@@ -71,5 +89,5 @@ where ≡ means "is isomorphic to".
 (** * Exercise (optional): *)
 Definition unit_neq_bool:
   unit <> bool
-:= replace_with_your_solution_here.
+:= todo.
 

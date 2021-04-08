@@ -6,8 +6,8 @@ Unset Printing Implicit Defensive.
 
 (* An (unsound) placeholder so that the whole file typechecks.
 Please replace it with your proof term. Your solutions may not
-use any axioms, including `replace_with_your_solution_here` *)
-Axiom replace_with_your_solution_here : forall {A : Type}, A.
+use any axioms, including `todo` *)
+Axiom todo : forall {A : Type}, A.
 
 
 (* WARNING!
@@ -35,7 +35,9 @@ Axiom replace_with_your_solution_here : forall {A : Type}, A.
 
 Definition and_via_ex (A B : Prop) :
   (exists (_ : A), B) <-> A /\ B
-:= replace_with_your_solution_here.
+:= conj
+  (fun '(ex_intro a b) => conj a b)
+  (fun '(conj a b) => ex_intro (fun => B) a b).
 
 
 (** * Exercise *)
@@ -54,7 +56,8 @@ Definition refl_if :
   (forall x y, R x y -> R y x) ->
   (forall x y z, R x y -> R y z -> R x z) ->
   forall x : D, (exists y, R x y) -> R x x
-:= replace_with_your_solution_here.
+:= fun symm trans x '(ex_intro y rxy) =>
+  trans x y x rxy (symm x y rxy).
 
 End Symmetric_Transitive_Relation.
 
@@ -62,7 +65,10 @@ End Symmetric_Transitive_Relation.
 (** * Exercise *)
 Definition pair_inj A B (a1 a2 : A) (b1 b2 : B) :
   (a1, b1) = (a2, b2) -> (a1 = a2) /\ (b1 = b2)
-:= replace_with_your_solution_here.
+:= fun e =>
+  match e in _ = (a2', b2') return (a1 = a2') /\ (b1 = b2') with
+  | erefl => conj erefl erefl
+  end.
 
 
 (** * Exercise *)
@@ -73,17 +79,33 @@ Inductive trilean : Type :=
 
 Definition yes_no_disj :
   Yes <> No
-:= replace_with_your_solution_here.
-
+:= fun e =>
+  match e
+    in _ = n
+    return if n is No then False else True
+  with
+  | erefl => I
+  end.
 
 (** * Exercise *)
 Definition addA : associative addn
-:= replace_with_your_solution_here.
+:= fix rec x y z :=
+  match x return x + (y + z) = x + y + z with
+  | O => erefl
+  | S x' => congr1 _ (rec x' y z)
+  end.
 
+Print left_commutative.
 
 (** * Exercise: *)
 Definition addnCA : left_commutative addn
-:= replace_with_your_solution_here.
+:= fix rec x y z :=
+  match y with
+  | O => erefl
+  | S y' => todo
+  end.
+
+
 
 (* Hint: re-use addnS lemma and some general lemmas about equality *)
 
@@ -99,12 +121,12 @@ Definition J :
   forall (A : Type) (P : forall (x y : A), x = y -> Prop),
     (forall x : A, P x x erefl) ->
     forall x y (p : x = y), P x y p
-:= replace_with_your_solution_here.
+:= todo.
 
 
 (** * Exercise (optional): *)
 Definition addnC : commutative addn
-:= replace_with_your_solution_here.
+:= todo.
 
 
 (** * Exercise (optional):
@@ -118,4 +140,4 @@ where ≡ means "is isomorphic to".
 (** * Exercise (optional): *)
 Definition unit_neq_bool:
   unit <> bool
-:= replace_with_your_solution_here.
+:= todo.
