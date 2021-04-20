@@ -100,12 +100,12 @@ Print left_commutative.
 (** * Exercise: *)
 Definition addnCA : left_commutative addn
 := fix rec x y z :=
-  match y with
+  match x with
   | O => erefl
-  | S y' => todo
+  | S x' => todo
   end.
 
-
+Print addnS.
 
 (* Hint: re-use addnS lemma and some general lemmas about equality *)
 
