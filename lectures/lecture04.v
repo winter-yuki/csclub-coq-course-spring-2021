@@ -115,7 +115,14 @@ different constructors are not equal.
 
 In Coq, the `Prop` universe drops this feature to
 support classical reasoning. We are going to talk
-about this a bit more later. |*)
+about this a bit more later.
+
+Чтобы можно было ввести закон исключенного третьего,
+все доказательства одного и того же должны быть неразличимы,
+поэтому для вселенной Prop отключена большая элиминаци.
+
+Большая элиминация это когда можно поматчив значение получить тип
+|*)
 
 Fail Definition or_introl_inj (A B : Prop) (p1 : A) (p2 : B) :
   or_introl p1 = or_intror p2 -> False

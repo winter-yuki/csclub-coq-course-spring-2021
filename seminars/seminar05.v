@@ -3,7 +3,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Axiom replace_with_your_solution_here : forall {A : Type}, A.
+Axiom todo : forall {A : Type}, A.
 
 
 
@@ -48,7 +48,7 @@ Admitted.
 (** * Exercise *)
 (** Implement a recursive function performing integer division by 2 *)
 Fixpoint div2 (n : nat) : nat :=
-  replace_with_your_solution_here.
+  todo.
 
 
 Arguments div2 : simpl nomatch.

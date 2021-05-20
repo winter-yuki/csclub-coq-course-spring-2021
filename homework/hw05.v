@@ -13,7 +13,17 @@ Unset Printing Implicit Defensive.
 Lemma nlem (A : Prop):
   ~ (A \/ ~ A) -> A.
 Proof.
-Admitted.
+  move=> nana.
+  exfalso.
+  apply: (nana).
+  right.
+  red.
+  intro.
+  apply: nana.
+  left.
+  done.
+Qed.
+
 (** Hint: you might want to use a separate lemma here to make progress.
 Or, use the `have` tactic: `have: statement` creates a new subgoal and asks
 you to prove the statement. This is like a local lemma. *)
@@ -23,7 +33,15 @@ you to prove the statement. This is like a local lemma. *)
 Lemma weak_Peirce (A B : Prop) :
   ((((A -> B) -> A) -> A) -> B) -> B.
 Proof.
-Admitted.
+  move=> abaab.
+  apply: (abaab).
+  move=> aba.
+  apply: (aba).
+  move=> a.
+  apply abaab.
+  intros.
+  done.
+Qed.
 
 
 (** * Exercise *)
@@ -32,27 +50,40 @@ Definition FIX := forall A : Type, (A -> A) -> A.
 
 Lemma fix_inconsistent :
   FIX -> False.
-Proof.
-Admitted.
-
+Proof. apply; done. Qed.
 
 Section Boolean.
 (** * Exercise *)
 Lemma negbNE b : ~~ ~~ b -> b.
-Proof.
-Admitted.
+Proof. case: b=> //. Qed.
 
 
 (** * Exercise *)
 Lemma negbK : involutive negb.
 Proof.
-Admitted.
+  red; red.
+  intros.
+  case x=> //.
+  (* How to apply negbNE lemma? *)
+Qed.
 
 
 (** * Exercise *)
 Lemma negb_inj : injective negb.
 Proof.
-Admitted.
+  red.
+  intros.
+  apply (congr1 negb) in H.
+  have: ~~ ~~ x1 = x1.
+  { destruct x1; done. }
+  move=> nnxx1.
+  rewrite -nnxx1.
+  have: ~~ ~~ x2 = x2.
+  { destruct x2; done. }
+  move=> nnxx2.
+  rewrite -nnxx2.
+  apply: H.
+Qed.
 
 End Boolean.
 
@@ -65,7 +96,16 @@ Fixpoint triple (n : nat) : nat :=
 Lemma triple_mul3 n :
   triple n = 3 * n.
 Proof.
-Admitted.
+  elim: n=> //.
+  intros.
+  move=> /=.
+  Search (_ * _.+1).
+  rewrite mulnSr.
+  rewrite H.
+  Search (_ + _).
+  rewrite addn3.
+  done.
+Qed.
 (** Hints:
 - use the /= action to simplify your goal: e.g. move=> /=.
 - use `Search (<pattern>)` to find a useful lemma about multiplication
@@ -77,6 +117,11 @@ Prove by it induction: you may re-use the addnS and addSn lemmas only *)
 Lemma double_inj m n :
   m + m = n + n -> m = n.
 Proof.
+  (* move: n. *)
+  elim: m n=> 
+  { intros.
+    destruct n=> //. }
+  intros.
 Admitted.
 (* This is a harder exercise than the previous ones but
    the tactics you already know are sufficient *)

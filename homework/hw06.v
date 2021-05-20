@@ -3,7 +3,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Axiom replace_with_your_solution_here : forall {A : Type}, A.
+Axiom todo : forall {A : Type}, A.
 
 
 (*
@@ -20,7 +20,7 @@ Inductive expr : Type :=
 | Mult of expr & expr.
 
 Fixpoint eval (e : expr) : nat :=
-  replace_with_your_solution_here.
+  todo.
 (* or use the following one
 
 Fixpoint eval (e : expr) : nat :=
@@ -42,7 +42,7 @@ Definition prog := seq instr.
 Definition stack := seq nat.
 
 Fixpoint run (p : prog) (s : stack) : stack :=
-  replace_with_your_solution_here.
+  todo.
 (* or use the following one
 
 Fixpoint run (p : prog) (s : stack) : stack :=
@@ -65,7 +65,7 @@ Fixpoint run (p : prog) (s : stack) : stack :=
 
 (* Compiler from the expression language to the stack language *)
 Fixpoint compile (e : expr) : prog :=
-  replace_with_your_solution_here.
+  todo.
 (* or use the following one
 
 Fixpoint compile (e : expr) : prog :=
@@ -95,7 +95,7 @@ Admitted.
 (* ==== OPTIONAL part: decompiler ==== *)
 
 Definition decompile (p : prog) : option expr :=
-  replace_with_your_solution_here.
+  todo.
 
 (** Prove [decompile] cancels [compile]. *)
 Lemma decompile_compile e :
