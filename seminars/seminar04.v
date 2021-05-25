@@ -50,6 +50,7 @@ automation. *)
 
 
 (** * Exercise *)
+
 Lemma imp_trans :
   (A -> B) -> (B -> C) -> (A -> C).
 Proof.
@@ -214,7 +215,7 @@ Lemma addnS :
 Proof.
   elim=> //.
   intros.
-  
+
 
 
 Admitted.

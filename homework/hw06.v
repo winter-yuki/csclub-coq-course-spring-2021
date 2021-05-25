@@ -26,9 +26,9 @@ Fixpoint eval (e : expr) : nat :=
 Fixpoint eval (e : expr) : nat :=
   match e with
   | Const n => n
-  | Plus e1 e2 => eval_expr e1 + eval_expr e2
-  | Minus e1 e2 => eval_expr e1 - eval_expr e2
-  | Mult e1 e2 => eval_expr e1 * eval_expr e2
+  | Plus e1 e2 => eval e1 + eval e2
+  | Minus e1 e2 => eval e1 - eval e2
+  | Mult e1 e2 => eval e1 * eval e2
   end.
 
 *)
@@ -93,6 +93,27 @@ Admitted.
 
 
 (* ==== OPTIONAL part: decompiler ==== *)
+
+Fixpoint decompile' (p : prog) (acc : seq expr) : seq expr :=
+  if p is (i :: p') then
+    let acc' :=
+        match i with
+        | Push n => Const n :: acc
+        | Add => if acc is (e1 :: e2 :: acc') then Plus e2 e1 :: acc'
+                 else acc
+        | Sub => if acc is (e1 :: e2 :: acc') then Minus e2 e1 :: acc'
+                 else acc
+        end
+    in
+    decompile' p' acc'
+  else acc.
+
+(** return a default value for the empty program *)
+Definition decompile (p : prog) : option expr :=
+  if decompile' p [::] is [:: result] then some result
+  else None.
+Arguments decompile p / : simpl nomatch.
+
 
 Definition decompile (p : prog) : option expr :=
   todo.
